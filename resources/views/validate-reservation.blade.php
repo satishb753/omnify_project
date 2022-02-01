@@ -29,8 +29,8 @@
                 <input type="number" class="form-control user_id" id="user_id_1" aria-describedby="user_id" placeholder="user_id">
             </div>
             <div class="form-group">
-                <label for="reservation_timestamp_utc"></label>
-                <input type="datetime-local" step=1 class="form-control" id="reservation_timestamp_utc">
+                <label for="reservation_timestamp_local"></label>
+                <input type="datetime-local" step=1 class="form-control" id="reservation_timestamp_local">
             </div>
             <div type="text" class="btn btn-primary" id="submit">Submit</div>
         </form>
@@ -58,7 +58,12 @@
                 }
             });
 
+            var dateAndTime = $("#reservation_timestamp_local").val();
+            // var dateAndTime = new Date(new Date().toUTCString().substr(0, 25))
+            var dateAndTimeInUTC = (new Date(dateAndTime)).toUTCString().substr(0, 25);
             console.log(userIds);
+            console.log(dateAndTimeInUTC);
+            // console.log(dateAndTime.toUTCString().substr(0, 25));
         });
 
         function convertTZ(date, tzString) {
