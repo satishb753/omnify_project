@@ -23,8 +23,9 @@
     <div class="container">
         <form style="margin-top: 100px;">
             <div class="form-group" id="append_user_id">
-                <label for="exampleInputEmail1">Please input user_id value(s)</label>
+                <label for="exampleInputEmail1">Please input user_id value(s)</label><br>
                 <div class="add_user_id btn btn-primary" id="add_user_id">Click to add more than one user_id fields</div>
+                <label for="exampleInputEmail1">(Duplicate entries will be automatically removed)</label>
                 <input type="number" class="form-control user_id" id="user_id_1" aria-describedby="user_id" placeholder="user_id">
             </div>
             <div class="form-group">
@@ -40,7 +41,7 @@
         var user_id_length = $('.user_id').length;
         $( "#add_user_id" ).click(()=>{
             var user_id_length = $('.user_id').length;
-            $('#append_user_id').append( `<div class="user_id_wrapper"><input type="text" class="form-control user_id" name="user_id_${user_id_length+1}" id="user_id_${user_id_length+1}" aria-describedby="emailHelp" placeholder="user_id #${user_id_length+1}"><div class="btn btn-sm btn-warning user_id_remove" id="user_id_remove">Click to remove</div></div>` );
+            $('#append_user_id').append( `<div class="user_id_wrapper"><input type="number" class="form-control user_id" name="user_id_${user_id_length+1}" id="user_id_${user_id_length+1}" aria-describedby="emailHelp" placeholder="user_id #${user_id_length+1}"><div class="btn btn-sm btn-warning user_id_remove" id="user_id_remove">Click to remove</div></div>` );
         });
 
         $( document ).on("click", "#user_id_remove",()=>{
@@ -51,17 +52,13 @@
         $("#submit").click(()=>{
             var userIds = [];
             $(".user_id").each((idx, el)=>{
-                id = $(el).val();
-                if(typeof id == "number" && id%10 == 0 && id > 0 && id < 1000000000) {
-                    userIds.push($(el).val());
+                id = parseInt($(el).val());
+                if( !isNaN(id)  ) {
+                    userIds.push(id);
                 }
             });
 
-            var newIntArray = userIds.map(function (item) {
-                return parseInt(item.replace(/\D/g, ''), 10);
-            });
-
-            console.log(newIntArray);
+            console.log(userIds);
         });
 
         function convertTZ(date, tzString) {
