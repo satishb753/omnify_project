@@ -25,13 +25,13 @@
             <div class="form-group" id="append_user_id">
                 <label for="exampleInputEmail1">Please input user_id value(s)</label>
                 <div class="add_user_id btn btn-primary" id="add_user_id">Click to add more than one user_id fields</div>
-                <input type="text" class="form-control user_id" id="user_id_1" aria-describedby="user_id" placeholder="user_id">
+                <input type="number" class="form-control user_id" id="user_id_1" aria-describedby="user_id" placeholder="user_id">
             </div>
             <div class="form-group">
                 <label for="reservation_timestamp_utc"></label>
                 <input type="datetime-local" step=1 class="form-control" id="reservation_timestamp_utc">
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div type="text" class="btn btn-primary" id="submit">Submit</div>
         </form>
     </div>
 
@@ -45,6 +45,23 @@
 
         $( document ).on("click", "#user_id_remove",()=>{
             $("#user_id_remove").closest(".user_id_wrapper").remove();
+        });
+
+
+        $("#submit").click(()=>{
+            var userIds = [];
+            $(".user_id").each((idx, el)=>{
+                id = $(el).val();
+                if(typeof id == "number" && id%10 == 0 && id > 0 && id < 1000000000) {
+                    userIds.push($(el).val());
+                }
+            });
+
+            var newIntArray = userIds.map(function (item) {
+                return parseInt(item.replace(/\D/g, ''), 10);
+            });
+
+            console.log(newIntArray);
         });
 
         function convertTZ(date, tzString) {
@@ -62,6 +79,23 @@
         const date = new Date()
         convertTZ(date, "Asia/Jakarta") // current date-time in jakarta.
     </script>
+
+
+
+
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+        -moz-appearance: textfield;
+        }
+    </style>
 </body>
 
 </html>
