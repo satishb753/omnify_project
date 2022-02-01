@@ -6,53 +6,31 @@ $timezonesJSON = file_get_contents($file);
 
 $timezones = json_decode($timezonesJSON, true);
 
-$b = array();
-$c = array();
-$result = array();
-$b = array_values($timezones[0]);
-
-$b_length=count($b);
-
-for($i=0;$i<$b_length;$i++){
-    array_push($c, array_values($b[$i]));
+for($i=0;$i<count($timezones);$i++) {
+    $b[] = array_values($timezones[$i]);
+    $names[] = array_keys($timezones[$i]);
 }
 
-// var_dump(array_values($b[0][0]));
-// var_dump($b[0][0]);
+// var_dump(array_keys($b[0])); //$b[0] is array(1) with array(3) with array(2)
 
-$c = $b[0][0];
-$c_length = count($c);
-$d = array_values($c);
-$d_length = count($d);
-for($i=0;$i<$d_length; $i++){
-    var_dump($d[$i]);
+for($i=0;$i<count($b);$i++){
+     for($j=0;$j<count($b[$i]);$j++){
+        for($k=0;$k<count($b[$i][$j]);$k++){
+            $values[] = $b[$i][$j][$k]["value"];
+            $labels[] = $b[$i][$j][$k]["label"];
+        }
+    }
 }
 
+// var_dump($c);
+// var_dump($d);
 
-
-
-
-
-
-
-
-// $a = array();
-// for($i=0; count($timezones); $i++){
-//     var_dump($timezones[$i]);
-// }
-
-// var_dump(count($timezones));
-// $a = array_keys($timezones[0]);
-// var_dump(array_values($a));
-// var_dump($a[0]);
-// for($i=0; count(array_keys($timezones[$i])); $i++){
-//     array_push($a, array_keys($timezones[$i]));
-// }
-
-
-// var_dump($a[0]);
-// for($i=0; count($a); $i++){
-//     var_dump($a[$i]);
-// }
+for($i=0;$i<count($names);$i++){
+    for($j=0;$j<count($names[$i]);$j++){
+        $difference[] = $names[$i][$j];
+    }
+}
+// var_dump($difference);
+var_dump($names);
 
 ?>
