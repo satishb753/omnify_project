@@ -13,4 +13,6 @@
 
 <p>The aforementioned two files are inside of 'resources/views' directory</p>
 
-## web.php and api.php hold the listings of routes and their respective controllers 
+## web.php and api.php hold the listings of routes and their respective controllers
+
+### Database tables have prefix txz_ hence it may take some time to setup in local environment. Please make sure to make required adjustments
