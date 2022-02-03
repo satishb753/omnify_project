@@ -70,7 +70,7 @@ class ReservationController extends Controller
                 break;
             case 'week':
                 $previousReservationsOfSameWeek = \DB::table('reservations')
-                                    ->where('user_id',$user_ids[0])
+                                    ->whereIn('user_id',$user_ids[0])
                                     ->where('reservation_timestamp_utc','<=',$incoming_datetime)
                                     ->where('reservation_timestamp_utc','>',$incoming_datetime - 7*24*60*60)
                                     ->orderBy('reservation_timestamp_utc','desc');
@@ -98,7 +98,7 @@ class ReservationController extends Controller
                 break;
             case 'month':
                 $previousReservationsOfSameMonth = \DB::table('reservations')
-                                    ->where('user_id',$user_ids[0])
+                                    ->whereIn('user_id',$user_ids[0])
                                     ->where('reservation_timestamp_utc','<=',$incoming_datetime)
                                     ->where('reservation_timestamp_utc','>',$incoming_datetime - 30*24*60*60)
                                     ->orderBy('reservation_timestamp_utc','desc');
