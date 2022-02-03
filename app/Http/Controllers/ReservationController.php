@@ -193,6 +193,11 @@ class ReservationController extends Controller
         //
     }
 
+    /**
+     * Modify the registration settings
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function modifySetting(Request $request) {
 
         $validated = $request->validate([
