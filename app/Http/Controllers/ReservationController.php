@@ -38,63 +38,100 @@ class ReservationController extends Controller
 
         $current_setting = \DB::table('restriction_settings')->find(1);
 
-        if($current_setting->g == 'individual'){
-            switch ($current_setting->d) {
-                case 'day':
-                    $previousReservationsOfSameDay = \DB::table('reservations')
-                                                ->where('user_id',$user_ids[0])
-                                                ->where('reservation_timestamp_utc','<=',$incoming_datetime)
-                                                ->where('reservation_timestamp_utc','>',$incoming_datetime - 24*60*60)
-                                                ->orderBy('reservation_timestamp_utc','desc');
-                    
-                    // Clone the query to keep the original query intact
-                    $latest_reservation = $previousReservationsOfSameDay->clone()->limit(1);
-                    $numberOfPreviousReservations = $previousReservationsOfSameDay->count();
-                    // dd($previousReservationsOfSameDay->count());
-                    if( $numberOfPreviousReservations > 0 
-                        && $numberOfPreviousReservations < $current_setting->n) {
+
+        switch ($current_setting->d) {
+            case 'day':
+                $previousReservationsOfSameDay = \DB::table('reservations')
+                                            ->whereIn('user_id',$user_ids)
+                                            ->where('reservation_timestamp_utc','<=',$incoming_datetime)
+                                            ->where('reservation_timestamp_utc','>',$incoming_datetime - 24*60*60)
+                                            ->orderBy('reservation_timestamp_utc','desc');
+                
+                // Clone the query to keep the original query intact
+                // $latest_reservation = $previousReservationsOfSameDay->clone()->limit(1);
+                $numberOfPreviousReservations = $previousReservationsOfSameDay->count();
+
+                if( $numberOfPreviousReservations >= 0 
+                    && $numberOfPreviousReservations < $current_setting->n) {
+                    for($i=0; $i<$group_size; $i++){
                         Reservation::insert([
-                            'user_id' => $user_ids[0], 
+                            'user_id' => $user_ids[$i], 
                             'reservation_timestamp_utc' => $incoming_datetime,
                         ]);
-                    } else {
-                        return response()->json(
+                    }
+                } else {
+                    return response()->json(
+                        [
+                        'success' => false,
+                        'message' => 'Reservation limit exceeded'
+                        ]
+                    );
+                }
+                break;
+            case 'week':
+                $previousReservationsOfSameWeek = \DB::table('reservations')
+                                    ->where('user_id',$user_ids[0])
+                                    ->where('reservation_timestamp_utc','<=',$incoming_datetime)
+                                    ->where('reservation_timestamp_utc','>',$incoming_datetime - 7*24*60*60)
+                                    ->orderBy('reservation_timestamp_utc','desc');
+
+                // Clone the query to keep the original query intact
+                // $latest_reservation = $previousReservationsOfSameDay->clone()->limit(1);
+                $numberOfPreviousReservations = $previousReservationsOfSameWeek->count();
+
+                if( $numberOfPreviousReservations >= 0 
+                && $numberOfPreviousReservations < $current_setting->n) {
+                    for($i=0; $i<$group_size; $i++){
+                        Reservation::insert([
+                            'user_id' => $user_ids[$i], 
+                            'reservation_timestamp_utc' => $incoming_datetime,
+                        ]);
+                    }
+                } else {
+                    return response()->json(
                             [
                             'success' => false,
                             'message' => 'Reservation limit exceeded'
                             ]
                         );
                     }
-                    break;
-                case 'week':
-                  
-                  break;
-                case 'month':
-                  
-                  break;
-                default:
-                  break;
-              }
-        }
+                break;
+            case 'month':
+                $previousReservationsOfSameMonth = \DB::table('reservations')
+                                    ->where('user_id',$user_ids[0])
+                                    ->where('reservation_timestamp_utc','<=',$incoming_datetime)
+                                    ->where('reservation_timestamp_utc','>',$incoming_datetime - 30*24*60*60)
+                                    ->orderBy('reservation_timestamp_utc','desc');
 
-        // if ($group_size == 1){
-        //     Reservation::insert([
-        //         'user_id' => $user_ids[0], 
-        //         'reservation_timestamp_utc' => $incoming_datetime,
-        //     ]);
-        // }
-        // else {
-        //     for($i=0; $i<$group_size; $i++){
-        //         Reservation::insert([
-        //             'user_id' => $user_ids[$i], 
-        //             'reservation_timestamp_utc' => $incoming_datetime,
-        //         ]);
-        //     }
-        // }
-        
+                // Clone the query to keep the original query intact
+                // $latest_reservation = $previousReservationsOfSameDay->clone()->limit(1);
+                $numberOfPreviousReservations = $previousReservationsOfSameMonth->count();
+
+                if( $numberOfPreviousReservations >= 0 
+                && $numberOfPreviousReservations < $current_setting->n) {
+                    for($i=0; $i<$group_size; $i++){
+                        Reservation::insert([
+                            'user_id' => $user_ids[$i], 
+                            'reservation_timestamp_utc' => $incoming_datetime,
+                        ]);
+                    }
+                } else {
+                    return response()->json(
+                        [
+                        'success' => false,
+                        'message' => 'Reservation limit exceeded'
+                        ]
+                    );
+                }
+                break;
+            default:
+                break;
+            }
+
+    
         return response()->json(
             [
-            'success' => true,
+            'success' => false,
             'message' => 'Reservation made successfully'
             ]
         );
