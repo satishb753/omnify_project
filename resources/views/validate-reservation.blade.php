@@ -7,6 +7,8 @@
 
     <title>Laravel</title>
 
+    <meta name="_token" content="{{csrf_token()}}" />
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -14,14 +16,18 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"></link>
 </head>
 
 <body>
     <div class="container">
         <form style="margin-top: 100px;">
+            @csrf
             <div class="form-group" id="append_user_id">
                 <label for="exampleInputEmail1">Please input user_id value(s)</label><br>
                 <div class="add_user_id btn btn-primary" id="add_user_id">Click to add more than one user_id fields</div>
@@ -48,7 +54,6 @@
             $("#user_id_remove").closest(".user_id_wrapper").remove();
         });
 
-
         $("#submit").click(()=>{
             var userIds = [];
             $(".user_id").each((idx, el)=>{
@@ -58,13 +63,38 @@
                 }
             });
 
-            var dateAndTime = $("#reservation_timestamp_local").val();
-            // var dateAndTime = new Date(new Date().toUTCString().substr(0, 25))
+            var dateAndTime = $("#reservation_timestamp_local").val(); 
+            let reservationDateInLOCAL = ((new Date(dateAndTime)).getTime())/1000;
+
             var dateAndTimeInUTC = (new Date(dateAndTime)).toUTCString().substr(0, 25);
-            console.log(userIds);
-            console.log(dateAndTimeInUTC);
-            // console.log(dateAndTime.toUTCString().substr(0, 25));
+            let reservationDateInUTC = ((new Date(dateAndTimeInUTC)).getTime())/1000;
+
+            let _token   = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+                url: '{{ url("/api/reservation/create") }}',
+                type: 'POST',
+                data: { 
+                    "data" : {
+                        "_token" : _token,
+                        "user_ids" : userIds,
+                        "reservation_datetime" : [reservationDateInUTC],
+                    }
+                },
+                // contentType: 'application/json; charset=utf-8',
+                // dataType: 'json',
+                async: false,
+                success: function(msg) {
+                    toastr.info(msg.message)
+                },
+                error: function(err) {
+                    toastr.info('Please check your input values.')
+                }
+            });
         });
+
+
+        
 
         function convertTZ(date, tzString) {
             return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
@@ -81,8 +111,6 @@
         const date = new Date()
         convertTZ(date, "Asia/Jakarta") // current date-time in jakarta.
     </script>
-
-
 
 
     <style>
